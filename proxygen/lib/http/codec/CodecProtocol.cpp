@@ -98,8 +98,10 @@ extern folly::Optional<std::pair<CodecProtocol, std::string>>
 checkForProtocolUpgrade(const std::string& clientUpgrade,
                         const std::string& serverUpgrade,
                         bool serverMode) {
+	std::string serverUpgradeCopy = serverUpgrade;
+	folly::toLowerAscii(serverUpgradeCopy);
   CodecProtocol protocol;
-  if (clientUpgrade.empty() || serverUpgrade.empty()) {
+  if (clientUpgrade.empty() || serverUpgradeCopy.empty()) {
     return folly::none;
   }
 
@@ -114,7 +116,7 @@ checkForProtocolUpgrade(const std::string& clientUpgrade,
   // only support one layer right now.  We just skip anything that
   // isn't an HTTP transport protocol
   std::vector<folly::StringPiece> serverProtocols;
-  folly::split(",", serverUpgrade, serverProtocols, true /* ignore empty */);
+  folly::split(",", serverUpgradeCopy, serverProtocols, true /* ignore empty */);
 
   for (auto& testProtocol : serverProtocols) {
     // Get rid of leading/trailing LWS
